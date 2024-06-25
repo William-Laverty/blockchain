@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain Demo</title>
+</head>
+<body>
+    <h1>Blockchain Demo</h1>
+    <h2>Add New Transaction</h2>
+    <form id="transactionForm">
+        <label for="author">Author:</label>
+        <input type="text" id="author" name="author" required>
+        <br>
+        <label for="content">Content:</label>
+        <input type="text" id="content" name="content" required>
+        <br>
+        <button type="submit">Add Transaction</button>
+    </form>
+    <h2>Mine Transactions</h2>
+    <button id="mineButton">Mine</button>
+    <h2>Blockchain</h2>
+    <pre id="chain"></pre>
+    <script>
+        document.getElementById('transactionForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const author = document.getElementById('author').value;
+            const content = document.getElementById('content').value;
+
+            fetch('/new_transaction', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ author, content }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                document.getElementById('transactionForm').reset();
+                loadChain();
+            });
+        });
+
+        document.getElementById('mineButton').addEventListener('click', function () {
+            fetch('/mine')
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                loadChain();
+            });
+        });
+
+        function loadChain() {
+            fetch('/chain')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('chain').textContent = JSON.stringify(data, null, 4);
+            });
+        }
+
+        window.onload = loadChain;
+    </script>
+</body>
+</html>
